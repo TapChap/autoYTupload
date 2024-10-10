@@ -1,5 +1,7 @@
 import os
 import sys
+
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (
     QApplication,
     QWidget,
@@ -13,7 +15,6 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
 )
 from PyQt5.QtCore import QTimer
-
 from uploadYTvideo import uploadVideo  # Ensure this is available
 
 class FileBrowserApp(QWidget):
@@ -36,13 +37,19 @@ class FileBrowserApp(QWidget):
         layout = QVBoxLayout()
         layout.setSpacing(10)
 
+        self.setWindowIcon(QIcon('youtube.ico'))  # Add this line to set the icon
+
+        # Warning Label at the top
+        warning_label = QLabel("Warning! Using this tool will close all open Chrome tabs, use with caution.", self)
+        warning_label.setStyleSheet("color: red; font-weight: bold; font-size: 12px;")
+
         # Create a frame for better visual separation
         frame = QFrame(self)
         frame.setFrameShape(QFrame.StyledPanel)
         frame.setStyleSheet("border: 1px solid #ccc; border-radius: 5px; padding: 10px;")
 
         # Create buttons, labels, and input fields
-        self.dir_label = QLabel(self.selected_directory, self)
+        self.dir_label = QLabel(f"Selected Directory: {self.selected_directory}", self)
         self.file_label = QLabel("", self)
 
         select_dir_button = QPushButton("Choose Directory", self)
@@ -77,6 +84,7 @@ class FileBrowserApp(QWidget):
         file_extension_layout.addWidget(self.file_extension_input)
 
         # Add widgets to layout
+        layout.addWidget(warning_label)  # Add the warning label to the top
         layout.addWidget(self.dir_label)
         layout.addWidget(select_dir_button)
         layout.addLayout(file_name_layout)  # File Name Layout
@@ -132,7 +140,7 @@ class FileBrowserApp(QWidget):
         arr = os.listdir(self.selected_directory)
         if (self.entered_file_name + self.file_extension) in arr:
             self.timer.stop()  # Stop the timer if the file is found
-            self.passResults()
+            self.pass_results()
         else:
             self.timeout += 1
             print("Waiting for file...")  # For debugging purposes
@@ -142,11 +150,11 @@ class FileBrowserApp(QWidget):
                 self.show_error_message("Program timed out.")
                 print("Program timed out.")
 
-    def passResults(self):
+    def pass_results(self):
         # Call the function from the other file to process the found file
+        video_path = os.path.join(self.selected_directory, f"{self.entered_file_name}{self.file_extension}")
+        uploadVideo(video_path)
         self.close()
-        uploadVideo(self.selected_directory + '\\', self.entered_file_name, self.file_extension)
-        sys.exit(self)
 
     def show_error_message(self, message):
         msg = QMessageBox()
