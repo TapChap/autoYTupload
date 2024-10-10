@@ -39,8 +39,7 @@ def uploadVideo(EXPORTED_VIDEO_PATH, FILE_NAME, FILE_EXTENSION):
     radio_button = driver.find_element(By.XPATH, "//tp-yt-paper-radio-button[@name='VIDEO_MADE_FOR_KIDS_NOT_MFK']")
     radio_button.click()
 
-    button = driver.find_element(By.XPATH,
-                                 "//button[@class='ytcp-button-shape-impl ytcp-button-shape-impl--filled ytcp-button-shape-impl--mono ytcp-button-shape-impl--size-m' and @aria-label='הבא']")
+    button = driver.find_element(By.XPATH,"//button[@class='ytcp-button-shape-impl ytcp-button-shape-impl--filled ytcp-button-shape-impl--mono ytcp-button-shape-impl--size-m' and @aria-label='הבא']")
     button.click()
 
     button = driver.find_element(By.XPATH,

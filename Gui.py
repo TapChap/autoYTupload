@@ -73,7 +73,11 @@ class FileBrowserApp(QWidget):
         select_dir_button.clicked.connect(self.browse_directory)
         save_button.clicked.connect(self.start_process)
 
-        # Layout for File Name
+        self.file_name_input.returnPressed.connect(self.start_process)       # Trigger on Enter key for file name
+        self.file_extension_input.returnPressed.connect(self.start_process)  # Trigger on Enter key for file extension
+
+
+# Layout for File Name
         file_name_layout = QHBoxLayout()
         file_name_layout.addWidget(self.file_name_title)
         file_name_layout.addWidget(self.file_name_input)
@@ -152,8 +156,7 @@ class FileBrowserApp(QWidget):
 
     def pass_results(self):
         # Call the function from the other file to process the found file
-        video_path = os.path.join(self.selected_directory, f"{self.entered_file_name}{self.file_extension}")
-        uploadVideo(video_path)
+        uploadVideo(self.selected_directory + "\\", self.entered_file_name, self.file_extension)
         self.close()
 
     def show_error_message(self, message):
