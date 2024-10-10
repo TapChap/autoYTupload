@@ -156,8 +156,8 @@ class FileBrowserApp(QWidget):
 
     def pass_results(self):
         # Call the function from the other file to process the found file
-        uploadVideo(self.selected_directory + "\\", self.entered_file_name, self.file_extension)
         self.close()
+        uploadVideo(self.selected_directory + "\\", self.entered_file_name, self.file_extension)
 
     def show_error_message(self, message):
         msg = QMessageBox()
