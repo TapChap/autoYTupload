@@ -1,0 +1,1 @@
+a script that recives a path and a file name, waits until the file appears in the directory when its done rendering, and immidietlly uploads it to youtube. the file is set as "private" and allows for customasation of the video when uploaded from a diffrent comuter
