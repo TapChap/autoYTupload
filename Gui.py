@@ -26,8 +26,9 @@ class FileBrowserApp(QWidget):
         self.entered_file_name = ""
         self.file_extension = ".mp4"  # Default file extension
         self.timer = None  # Timer to check for the file
-        self.timeout_seconds = 1800  # Timeout after 30 minutes
-        self.timeout = 0  # Timeout counter
+        self.stable_check_count = 0
+        self.stability_checks = 3
+        self.last_size = 0
 
         # Create the UI components
         self.init_ui()
@@ -76,8 +77,7 @@ class FileBrowserApp(QWidget):
         self.file_name_input.returnPressed.connect(self.start_process)       # Trigger on Enter key for file name
         self.file_extension_input.returnPressed.connect(self.start_process)  # Trigger on Enter key for file extension
 
-
-# Layout for File Name
+        # Layout for File Name
         file_name_layout = QHBoxLayout()
         file_name_layout.addWidget(self.file_name_title)
         file_name_layout.addWidget(self.file_name_input)
@@ -119,6 +119,7 @@ class FileBrowserApp(QWidget):
         file_extension = self.file_extension_input.text().strip()
 
         # Set the file extension with the dot prefix
+
         if file_extension:
             self.file_extension = f".{file_extension}"
         else:
@@ -126,35 +127,40 @@ class FileBrowserApp(QWidget):
 
         if file_name and self.selected_directory:
             self.entered_file_name = file_name
-            self.file_label.setText(f"Waiting for: {self.selected_directory}/{self.file_name_input.text()}{self.file_extension}")
+            self.file_label.setText(f"Waiting for: {self.selected_directory}/{self.file_name_input.text()}{self.file_extension} to finish exporting")
 
-            # Reset timeout and start the timer to check for file existence
-            self.timeout = 0
-            self.start_timer()
-        else:
-            self.file_label.setText("Please enter a file name and choose a directory.")
+        arr = os.listdir(self.selected_directory)
+        if (self.entered_file_name + self.file_extension) not in arr:
+            self.show_error_message("the specified file wasn't found")
+
+        self.start_timer()
 
     def start_timer(self):
         self.timer = QTimer(self)
-        self.timer.timeout.connect(self.check_for_file)
+        self.timer.timeout.connect(self.check_for_file_size)
         self.timer.start(1000)  # Check every second
 
-    def check_for_file(self):
-        # Check if the file exists in the selected directory
-        arr = os.listdir(self.selected_directory)
-        if (self.entered_file_name + self.file_extension) in arr:
-            self.timer.stop()  # Stop the timer if the file is found
-            self.pass_results()
+    def check_for_file_size(self):
+        filePath = self.selected_directory + "/" + self.file_name_input.text() + self.file_extension
+
+        current_size = os.path.getsize(filePath)
+
+        # Check if size is the same as last time
+        if current_size == self.last_size:
+            self.stable_check_count += 1
         else:
-            self.timeout += 1
-            print("Waiting for file...")  # For debugging purposes
+            self.stable_check_count = 0  # Reset if file size changed
 
-            if self.timeout >= self.timeout_seconds:
-                self.timer.stop()
-                self.show_error_message("Program timed out.")
-                print("Program timed out.")
+        # Update last known size
+        self.last_size = current_size
 
-    def pass_results(self):
+        # Check if file has been stable for enough checks
+        if self.stable_check_count >= self.stability_checks:
+            print("Export complete!")
+            self.timer.stop()  # Stop checking further
+            self.uploadVideo()
+
+    def uploadVideo(self):
         # Call the function from the other file to process the found file
         self.close()
         uploadVideo(self.selected_directory + "\\", self.entered_file_name, self.file_extension)
