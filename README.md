@@ -1,6 +1,6 @@
 # 🎥 YouTube Video Export and Upload Automation
 
-This project automates the process of uploading videos to YouTube once they are finished exporting from DaVinci Resolve. It allows you to set up the upload script and leave your computer, so you can edit the video details later from any device without having to wait for the export to complete.
+This project automates the process of uploading videos to YouTube once they are finished exporting from your editting sftware. It allows you to set up the upload script and leave your computer, so you can edit the video details later from any device without having to wait for the export to complete.
 
 ## ✨ Features
 
